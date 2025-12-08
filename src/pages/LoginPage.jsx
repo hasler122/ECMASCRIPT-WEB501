@@ -1,24 +1,32 @@
-import axios from 'axios';
-import { useState } from 'react';
-import toast from 'react-hot-toast';
+import axios from "axios";
+import { useState } from "react";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const navigate = useNavigate();
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
-    const handleSubmit = async event => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
 
+        if (!email.trim() || !password.trim()) {
+            return toast.error("Vui lòng nhập đầy đủ thông tin");
+        }
+
         try {
-            const { data } = await axios.post('http://localhost:3000/login', {
+            const { data } = await axios.post("http://localhost:3000/login", {
                 email,
                 password,
             });
 
-            localStorage.setItem('token', data.accessToken);
-            toast.success('Đăng nhập thành công');
+            localStorage.setItem("token", data.accessToken);
+
+            toast.success("Đăng nhập thành công");
+            navigate("/dashboard"); // chuyển đến trang bảo vệ
         } catch (error) {
-            toast.error(error.message || 'Đăng nhập thất bại');
+            toast.error("Sai tài khoản hoặc mật khẩu");
         }
     };
 
@@ -34,19 +42,20 @@ export default function LoginPage() {
                     <input
                         type="email"
                         value={email}
-                        onChange={e => setEmail(e.target.value)}
+                        onChange={(e) => setEmail(e.target.value)}
                         placeholder="Nhập email"
-                        className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                        className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
+
                 <div>
                     <label className="text-sm font-semibold">Mật khẩu</label>
                     <input
                         type="password"
                         value={password}
-                        onChange={e => setPassword(e.target.value)}
+                        onChange={(e) => setPassword(e.target.value)}
                         placeholder="Nhập password"
-                        className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                        className="w-full mt-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-400"
                     />
                 </div>
 

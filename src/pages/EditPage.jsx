@@ -3,8 +3,11 @@ import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 function EditPage() {
-  const { id } = useParams(); // lấy id từ URL
+  const { id } = useParams();
   const navigate = useNavigate();
+
+  const [loading, setLoading] = useState(true);
+
 
   const [form, setForm] = useState({
     name: "",
@@ -15,12 +18,10 @@ function EditPage() {
     description: "",
     available: "",
     category: "",
-    active: true,
+    status: true,
   });
 
-  const [loading, setLoading] = useState(true);
 
-  // Fetch tour theo ID
   useEffect(() => {
     fetch(`http://localhost:3000/tours/${id}`)
       .then((res) => res.json())
@@ -34,16 +35,17 @@ function EditPage() {
       });
   }, [id]);
 
-  // Change handler
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
+
     setForm({
       ...form,
       [name]: type === "checkbox" ? checked : value,
     });
   };
 
-  // Submit update
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
@@ -147,25 +149,30 @@ function EditPage() {
           />
         </div>
 
+
         <div>
           <label className="font-medium">Loại tour</label>
-          <input
-            type="text"
+          <select
             name="category"
             value={form.category}
             onChange={handleChange}
             className="w-full p-2 border rounded"
-          />
+          >
+            <option value="">-- Chọn loại tour --</option>
+            <option value="Tour nội địa">Tour nội địa</option>
+            <option value="Tour quốc tế">Tour quốc tế</option>
+          </select>
         </div>
+
 
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            name="active"
-            checked={form.active}
+            name="status"
+            checked={form.status}
             onChange={handleChange}
           />
-          <label>Hoạt động</label>
+          <label>Đang hoạt động</label>
         </div>
 
         <button

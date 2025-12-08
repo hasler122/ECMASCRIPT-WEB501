@@ -1,10 +1,12 @@
 import { Toaster } from "react-hot-toast";
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route, Link, useNavigate } from "react-router-dom";
 import List from "./pages/ListPage";
 import Add from "./pages/AddPage";
 import Edit from "./pages/EditPage";
 import RegisterPage from "./pages/RegisterPage";
 import LoginPage from "./pages/LoginPage";
+import ProtectedRoute from "./ProtectedRoute";
+
 function Home() {
   return (
     <div className="text-center py-10">
@@ -15,6 +17,14 @@ function Home() {
 }
 
 function App() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <>
       {/* NAVBAR */}
@@ -27,14 +37,27 @@ function App() {
           {/* Menu desktop */}
           <div className="hidden md:flex items-center space-x-8">
             <Link to="/" className="hover:text-gray-200">Trang chủ</Link>
-            <Link to="/list" className="hover:text-gray-200">Danh sách</Link>
-            <Link to="/add" className="hover:text-gray-200">Thêm mới</Link>
+            {token && (
+              <>
+                <Link to="/list" className="hover:text-gray-200">Danh sách</Link>
+                <Link to="/add" className="hover:text-gray-200">Thêm mới</Link>
+              </>
+            )}
           </div>
 
           {/* Right menu desktop */}
           <div className="hidden md:flex items-center space-x-6">
-            <Link to="/login" className="hover:text-gray-200">Đăng nhập</Link>
-            <Link to="/register" className="hover:text-gray-200">Đăng ký</Link>
+            {!token && (
+              <>
+                <Link to="/login" className="hover:text-gray-200">Đăng nhập</Link>
+                <Link to="/register" className="hover:text-gray-200">Đăng ký</Link>
+              </>
+            )}
+            {token && (
+              <button onClick={handleLogout} className="hover:text-gray-200">
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </nav>
@@ -43,11 +66,32 @@ function App() {
       <div className="max-w-6xl mx-auto mt-10 px-4">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/list" element={<List />} />
-          <Route path="/add" element={<Add />} />
-          <Route path="/edit/:id" element={<Edit />} />
+          <Route
+            path="/list"
+            element={
+              <ProtectedRoute>
+                <List />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/add"
+            element={
+              <ProtectedRoute>
+                <Add />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/edit/:id"
+            element={
+              <ProtectedRoute>
+                <Edit />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/login" element={<LoginPage />} /> 
+          <Route path="/login" element={<LoginPage />} />
         </Routes>
       </div>
 
